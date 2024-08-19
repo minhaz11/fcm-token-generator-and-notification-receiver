@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FCM Token Generator</title>
+    <script src="https://www.gstatic.com/firebasejs/8.0.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.0.0/firebase-messaging.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body class="bg-gray-100 flex items-center justify-center min-h-screen">
+    <div class="bg-white p-8 rounded-lg shadow-md max-w-xl w-full text-center">
+        <h1 class="text-2xl font-bold mb-6">Firebase Cloud Messaging</h1>
+        <button id="generate-token"
+            class="bg-blue-500 text-white font-semibold py-2 px-4 rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50">
+            Generate FCM Token
+        </button>
+        <div class="mt-6">
+            <label for="token" class="block text-gray-700 font-bold mb-2">FCM Token:</label>
+            <div id="token-container" class="relative">
+                <p id="token" class="bg-gray-100 text-gray-700 p-4 rounded-md border border-gray-300 overflow-x-auto whitespace-pre-wrap"></p>
+                <button id="copy-token"
+                    class="absolute top-1/2 right-2 transform -translate-y-1/2 bg-gray-300 text-gray-600 px-2 py-1 rounded hover:bg-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50">
+                    Copy
+                </button>
+            </div>
+        </div>
+        <p id="notification" class="mt-6 text-gray-700"></p>
+    </div>
+
+    <script>
+        const firebaseConfig = {
+            apiKey: "xxxxxxxxxxxxxxxxxxxxx",
+            authDomain: "xxxxxxxxxxxxxxxxxx",
+            projectId: "xxxxxxxxxxxxxx",
+            storageBucket: "xxxxxxxxxxxxxxxxxxxxxx",
+            messagingSenderId: "xxxxxxxxxxxxxxxxxxxxx",
+            appId: "xxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+        };
+
+        firebase.initializeApp(firebaseConfig);
+
+        const messaging = firebase.messaging();
+
+        document.getElementById('generate-token').onclick = function () {
+            navigator.serviceWorker.register('firebase-messaging-sw.js')
+                .then((registration) => {
+                    console.log('Service Worker registered with scope:', registration.scope);
+
+                    messaging.getToken({
+                        vapidKey: 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx'
+                    }).then(token => {
+                        const tokenElement = document.getElementById('token');
+                        tokenElement.textContent = token;
+                        console.log(token);
+                    }).catch((error) => {
+                        console.error('No token found:', error);
+                    });
+                })
+                .catch((error) => {
+                    console.error('Service Worker registration failed:', error);
+                });
+        };
+
+        // Copy token to clipboard
+        document.getElementById('copy-token').onclick = function () {
+            const tokenText = document.getElementById('token').textContent;
+            navigator.clipboard.writeText(tokenText).then(() => {
+                alert('Token copied to clipboard!');
+            }).catch(err => {
+                console.error('Failed to copy token:', err);
+            });
+        };
+
+        messaging.onMessage((payload) => {
+            console.log('Message received. ', payload);
+            document.getElementById('notification').textContent = 'Notification: ' + payload.notification.title;
+        });
+    </script>
+</body>
+
+</html>
