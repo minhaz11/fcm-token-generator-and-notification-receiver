@@ -45,6 +45,7 @@ This application is a simple web-based tool designed to generate Firebase Cloud 
 ## Firebase Setup
 
 Ensure that your Firebase project is correctly configured and replace the Firebase configuration in the JavaScript file with your project's details.
+also collect your vapidKey from firbase console.
 
 ```javascript
 const firebaseConfig = {
